@@ -1,32 +1,25 @@
 import java.util.HashMap;
 
 public class Server {
-    private HashMap<Integer, String> database;
+    
     private HashMap<String,Command> commands = new HashMap<String,Command>();
-
-    public void insert_database(Dados dados) {
-        database.put(dados.id,dados.nome);
-    }
-
-    public void delete_database(int id) {
-        database.remove(id);
-    }
-
-    public String get_database(int id) {
-        return database.get(id).toString();
-    }
-
-    public String get_all_database() {
-        return database.toString();
-    }
-
+    private Database database;
     public Server() {
-        this.database = new HashMap<Integer, String>();
-        this.commands.put("new",new newCommand());
+        this.database = new Database();
+        this.commands.put("new",new newCommand(this.database));
+        this.commands.put("delete",new deleteCommand(this.database));
+        this.commands.put("all",new getAllCommand(this.database));
+        this.commands.put("get",new getCommand(this.database));
     }
 
-    public void Service(String nome, Dados dados) {
-        Command comando = this.commands.get(nome);
-        System.out.println(comando.execute(dados));
+    public Object Service(String nome, Dados dados) {
+        try {
+            Command comando = this.commands.get(nome);
+            return comando.execute(dados);
+            
+        } catch (Exception e) {
+            return "Erro ao executar comando: "+e;
+
+        }
     }
 }
